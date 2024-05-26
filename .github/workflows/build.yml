@@ -27,27 +27,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
-            jid: 1
-            goal: build
-            arch: x86_64
-            openssl_archs: linux-x86_64
-          - os: ubuntu-22.04
-            jid: 2
-            goal: build
-            arch: x86_64
-            openssl_archs: linux-x86_64
-            staticx: yes
-          - os: macos-12
-            jid: 3
-            goal: build
-            arch: x86_64
-            openssl_archs: darwin64-x86_64
-          - os: macos-14
-            jid: 4
-            goal: build
-            arch: aarch64
-            openssl_archs: darwin64-arm64
+#          - os: ubuntu-22.04
+#            jid: 1
+#            goal: build
+#            arch: x86_64
+#            openssl_archs: linux-x86_64
+#          - os: ubuntu-22.04
+#            jid: 2
+#            goal: build
+#            arch: x86_64
+#            openssl_archs: linux-x86_64
+#            staticx: yes
+#          - os: macos-12
+#            jid: 3
+#            goal: build
+#            arch: x86_64
+#            openssl_archs: darwin64-x86_64
+#          - os: macos-14
+#            jid: 4
+#            goal: build
+#            arch: aarch64
+#            openssl_archs: darwin64-arm64
 #          - os: macos-14
 #            jid: 5
 #            goal: build
@@ -405,7 +405,7 @@ jobs:
             "${PYTHON}" -m pip install --upgrade --force-reinstall --no-binary :all: \
                               --no-cache-dir --no-deps --use-pep517 \
                               --use-feature=no-binary-enable-wheel-cache \
-                              cffi 
+                              cffi
             echo "before cryptography..."
             "${PYTHON}" -m pip list
             # cryptography has a universal2 wheel but getting it installed
@@ -428,6 +428,10 @@ jobs:
           fi
           echo "after everything..."
           "${PYTHON}" -m pip list
+
+      - name: Check if cryptography works
+        run: |
+          "${PYTHON}" -c "import cryptography.x509; print(cryptography.x509)"
 
       - name: Install PyInstaller
         if: matrix.goal == 'build'
@@ -494,6 +498,20 @@ jobs:
           fi
           echo "gam=${gam}" >> $GITHUB_ENV
           echo -e "GAM: ${gam}\nGAMPATH: ${gampath}"
+
+          echo "---------------------------------------------------"
+          echo "                  ANALYSIS                         "
+          echo "---------------------------------------------------"
+          cat build/gam/Analysis*.toc
+          echo "---------------------------------------------------"
+
+          echo "---------------------------------------------------"
+          echo "                  CONTENTS                         "
+          echo "---------------------------------------------------"
+          ls -l "${distpath}"/gamadv-xtd3
+          echo "---------------------------------------------------"
+          ls -l "${distpath}"/gamadv-xtd3/_internal
+          echo "---------------------------------------------------"
 
       - name: Copy extra package files
         if: matrix.goal == 'build'
