@@ -457,6 +457,13 @@ jobs:
           echo "---- Installing PyInstaller ----"
           "${PYTHON}" -m pip install .
 
+      - name: Check base_prefix
+        if: matrix.goal == 'build'
+        run: |
+          "${PYTHON}" -c "import sys; import os; print('sys.base_prefix:', sys.base_prefix); print(os.listdir(sys.base_prefix))"
+          "${PYTHON}" -c "import sys; import os; print('sys.prefix:', sys.prefix); print(os.listdir(sys.prefix))"
+          "${PYTHON}" -c "import sys; import os; import PyInstaller.compat; print('PyInstaller.compat.base_prefix:', PyInstaller.compat.base_prefix); print(os.listdir(PyInstaller.compat.base_prefix))"
+
       - name: Build GAM with PyInstaller
         if: matrix.goal != 'test'
         run: |
@@ -508,9 +515,9 @@ jobs:
           echo "---------------------------------------------------"
           echo "                  CONTENTS                         "
           echo "---------------------------------------------------"
-          ls -l "${distpath}"/gamadv-xtd3
+          ls -l "${gampath}"
           echo "---------------------------------------------------"
-          ls -l "${distpath}"/gamadv-xtd3/_internal
+          ls -l "${gampath}/_internal"
           echo "---------------------------------------------------"
 
       - name: Copy extra package files
